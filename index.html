@@ -1,470 +1,353 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Max Deadroom — About</title>
+  <title>Max Deadroom — deadroom.net</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;1,300&family=Owners+Text:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,200;0,300;1,200&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
   <style>
-    :root {
-      --bg: #0a0a0a;
-      --fg: #e8e4dc;
-      --accent: #c8b89a;
-      --dim: #4a4540;
-      --mid: #2a2520;
-      --mono: 'IBM Plex Mono', monospace;
-      --serif: Georgia, 'Times New Roman', serif;
-    }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { font-size: 16px; scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--fg);
-      font-family: var(--mono);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* Generative canvas background */
-    #canvas-container {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 0;
-      opacity: 0.18;
-      pointer-events: none;
-    }
-
-    /* Nav */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.5rem 2.5rem;
-      border-bottom: 1px solid var(--mid);
-      background: rgba(10,10,10,0.85);
-      backdrop-filter: blur(8px);
-    }
-
-    .nav-id {
-      font-size: 0.7rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--dim);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover { color: var(--fg); }
-
-    /* Main content */
-    main {
-      position: relative;
-      z-index: 10;
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 10rem 2.5rem 6rem;
-    }
-
-    /* Header block */
-    .header-block {
-      margin-bottom: 5rem;
-      border-left: 1px solid var(--dim);
-      padding-left: 2rem;
-    }
-
-    .label {
-      font-size: 0.6rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--dim);
-      margin-bottom: 1.2rem;
-    }
-
-    h1 {
-      font-family: var(--serif);
-      font-size: clamp(2.8rem, 6vw, 4.5rem);
-      font-weight: 400;
-      font-style: italic;
-      line-height: 1.05;
-      color: var(--fg);
-      margin-bottom: 0.4rem;
-      letter-spacing: -0.02em;
-    }
-
-    .name-sub {
-      font-size: 0.65rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--dim);
-      margin-top: 1rem;
-    }
-
-    .name-sub span {
-      color: var(--accent);
-    }
-
-    /* Divider */
-    .divider {
-      width: 100%;
-      height: 1px;
-      background: var(--mid);
-      margin: 3rem 0;
-    }
-
-    /* Bio sections */
-    .bio-section {
-      margin-bottom: 3.5rem;
-    }
-
-    .section-label {
-      font-size: 0.58rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--dim);
-      margin-bottom: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .section-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--mid);
-    }
-
-    p {
-      font-family: var(--mono);
-      font-size: 0.9rem;
-      font-weight: 300;
-      line-height: 1.85;
-      color: #c8c4bc;
-      margin-bottom: 1.4rem;
-    }
-
-    p em {
-      font-style: italic;
-      color: var(--accent);
-    }
-
-    /* Roles block */
-    .roles-block {
-      margin: 3rem 0;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5px;
-      background: var(--mid);
-      border: 1px solid var(--mid);
-    }
-
-    .role-cell {
-      background: var(--bg);
-      padding: 1.5rem;
-    }
-
-    .role-title {
-      font-size: 0.62rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-    }
-
-    .role-org {
-      font-size: 0.8rem;
-      color: var(--fg);
-      margin-bottom: 0.3rem;
-      font-weight: 400;
-    }
-
-    .role-desc {
-      font-size: 0.68rem;
-      color: var(--dim);
-      line-height: 1.6;
-      font-family: var(--mono);
-    }
-
-    /* Tags / disciplines */
-    .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 2rem;
-    }
-
-    .tag {
-      font-size: 0.58rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--dim);
-      border: 1px solid var(--mid);
-      padding: 0.35rem 0.7rem;
-      transition: all 0.2s;
-    }
-
-    .tag:hover {
-      color: var(--accent);
-      border-color: var(--dim);
-    }
-
-    /* Footer strip */
-    .page-footer {
-      margin-top: 5rem;
-      padding-top: 2rem;
-      border-top: 1px solid var(--mid);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .footer-id {
-      font-size: 0.6rem;
-      letter-spacing: 0.15em;
-      color: var(--dim);
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    .footer-links a {
-      font-size: 0.6rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--dim);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-
-    .footer-links a:hover { color: var(--accent); }
-
-    /* Pulse indicator */
-    .pulse {
-      display: inline-block;
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      margin-right: 0.5rem;
-      animation: pulse 2.4s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.2; }
-    }
-
-    @media (max-width: 600px) {
-      .roles-block { grid-template-columns: 1fr; }
-      nav { padding: 1.2rem 1.5rem; }
-      main { padding: 8rem 1.5rem 4rem; }
-      .header-block { padding-left: 1rem; }
-    }
+    :root { --bg: #060608; --fg: #d8d4cc; --cyan: #00e8cc; --mono: 'IBM Plex Mono', monospace; }
+    html, body { width: 100%; height: 100%; background: var(--bg); overflow: hidden; font-family: var(--mono); cursor: crosshair; }
+    canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: block; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 1.8rem 2.5rem; pointer-events: none; }
+    .nav-left { pointer-events: all; }
+    .site-name { font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg); opacity: 0.5; text-decoration: none; transition: opacity 0.3s; }
+    .site-name:hover { opacity: 1; }
+    .nav-right { display: flex; gap: 2.5rem; pointer-events: all; }
+    .nav-right a { font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg); opacity: 0.3; text-decoration: none; transition: opacity 0.3s; }
+    .nav-right a:hover { opacity: 1; }
+    #center-ui { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; text-align: center; transition: opacity 0.8s ease; }
+    #center-ui.hidden { opacity: 0; pointer-events: none; }
+    .main-title { font-size: clamp(0.9rem, 2vw, 1.1rem); font-weight: 200; font-style: italic; letter-spacing: 0.35em; color: var(--fg); opacity: 0.9; margin-bottom: 0.5rem; text-transform: lowercase; }
+    .tagline { font-size: 0.52rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--fg); opacity: 0.3; margin-bottom: 3rem; }
+    #activate-btn { font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--bg); background: var(--cyan); border: none; padding: 0.7rem 1.8rem; cursor: pointer; transition: background 0.2s, transform 0.1s; outline: none; }
+    #activate-btn:hover { background: #fff; transform: scale(1.03); }
+    #activate-btn:active { transform: scale(0.98); }
+    #status { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 100; font-size: 0.52rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg); opacity: 0; transition: opacity 0.5s; }
+    #status.visible { opacity: 0.25; }
+    #deny-msg { position: fixed; bottom: 3rem; left: 50%; transform: translateX(-50%); z-index: 100; font-size: 0.55rem; letter-spacing: 0.12em; color: #ff2244; opacity: 0; transition: opacity 0.5s; white-space: nowrap; }
+    #deny-msg.visible { opacity: 0.7; }
   </style>
 </head>
 <body>
 
-<div id="canvas-container"></div>
-
 <nav>
-  <div class="nav-id">deadroom.net</div>
-  <ul class="nav-links">
-    <li><a href="#">work</a></li>
-    <li><a href="#">music</a></li>
-    <li><a href="#">about</a></li>
-    <li><a href="#">contact</a></li>
-  </ul>
+  <div class="nav-left"><a href="/" class="site-name">deadroom.net</a></div>
+  <div class="nav-right">
+    <a href="/work">work</a>
+    <a href="/music">music</a>
+    <a href="/about">about</a>
+    <a href="mailto:max@deadroom.net">contact</a>
+  </div>
 </nav>
 
-<main>
-
-  <div class="header-block">
-    <div class="label">— about</div>
-    <h1>Max Deadroom</h1>
-    <div class="name-sub">Maxwell Lewis &nbsp;/&nbsp; <span>Columbus, OH</span></div>
-  </div>
-
-  <div class="bio-section">
-    <div class="section-label">origin</div>
-    <p>
-      I've been making things with sound for over twenty years. It started with music — always music — and spread outward into audio engineering, film scoring, instrument design, generative composition, creative code, visual art. The tools changed constantly. The impulse didn't.
-    </p>
-    <p>
-      For a long time I thought I was building toward a specific destination: an academic career, a tenure track, a place at the front of a lecture hall. I had the degree, the experience, the conviction. Then I looked clearly at where that road was going — not with bitterness, but with the kind of honesty that only comes after years of moving in too many directions at once — and I chose differently.
-    </p>
-  </div>
-
-  <div class="divider"></div>
-
-  <div class="bio-section">
-    <div class="section-label">now</div>
-    <p>
-      I moved back to Columbus, Ohio, my hometown. Returning gave me something I hadn't expected: permission to stop treating the breadth of my interests as a problem to solve. Twenty years of chasing sound into film, code, visual art, hardware, pedagogy — that's not a lack of focus. That's a method. It just took a while to trust it.
-    </p>
-    <p>
-      The work that feels most alive: making art, and creating conditions where others can make it too. Not as a service. As a practice. I am most myself when I am <em>building a thing</em> or <em>helping someone else find theirs</em> — those two states, alternating, constitute most of what I consider a good day.
-    </p>
-  </div>
-
-  <div class="roles-block">
-    <div class="role-cell">
-      <div class="role-title">Programming Director</div>
-      <div class="role-org">Columbus on the Spectrum</div>
-      <div class="role-desc">Community and networking nonprofit for autistic adults. Building programming that treats neurodivergence as a way of being, not a deficit to manage.</div>
-    </div>
-    <div class="role-cell">
-      <div class="role-title">Art Director</div>
-      <div class="role-org">Open Arms Health Systems</div>
-      <div class="role-desc">Occupational arts nonprofit for adults with disabilities. Supporting artists who want to make and sell work on their own terms.</div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <div class="bio-section">
-    <div class="section-label">the work</div>
-    <p>
-      My practice sits at the intersection of sound, code, and image — usually in that order, often all at once. I work with modular synthesis and VCV Rack for composition, p5.js and Magic Music Visuals for audio-reactive visual art, and whatever combination of tools the piece requires. I am drawn to <em>process as content</em>: the patch, the improvisation, the system that surprises its author.
-    </p>
-    <p>
-      I make music under the name Max Deadroom. I make visual art under the same name. I am not particularly interested in separating them. The sound informs the image. The image informs the sound. The site you're looking at is built on the same logic.
-    </p>
-    <p>
-      I have been an audio engineer, a record producer, a filmmaker, a videographer, a sound designer, a lecturer, an instrument builder, a creative coder, a community organizer. I am not listing these as credentials. I am listing them as evidence of a single stubborn preoccupation: <em>what does it mean to make something, and how do you get better at it?</em>
-    </p>
-  </div>
-
-  <div class="divider"></div>
-
-  <div class="bio-section">
-    <div class="section-label">on AI &amp; the field</div>
-    <p>
-      I spent two decades becoming expert in a craft that technology is now capable of approximating cheaply and at scale. I have complicated feelings about this, and I don't think pretending otherwise serves anyone. What I've concluded — provisionally, honestly — is that the irreplaceable parts of creative work have always been the human parts: the judgment, the care, the relationships, the willingness to be changed by what you make. I'm interested in those parts. I work in fields where they still matter. I will keep making things by hand.
-    </p>
-  </div>
-
-  <div class="tags">
-    <span class="tag">modular synthesis</span>
-    <span class="tag">musique concrète</span>
-    <span class="tag">generative composition</span>
-    <span class="tag">audio-reactive visuals</span>
-    <span class="tag">creative code</span>
-    <span class="tag">p5.js</span>
-    <span class="tag">vcv rack</span>
-    <span class="tag">film scoring</span>
-    <span class="tag">sound design</span>
-    <span class="tag">instrument design</span>
-    <span class="tag">community arts</span>
-    <span class="tag">neurodivergent</span>
-  </div>
-
-  <div class="page-footer">
-    <div class="footer-id">
-      <span class="pulse"></span>
-      max@deadroom.net
-    </div>
-    <div class="footer-links">
-      <a href="https://deadroommusic.bandcamp.com">bandcamp</a>
-      <a href="https://instagram.com/maxedonia">instagram</a>
-      <a href="https://github.com/maxedonia">github</a>
-      <a href="https://linkedin.com/in/maxedonia">linkedin</a>
-    </div>
-  </div>
-
-</main>
+<div id="center-ui">
+  <div class="main-title">max deadroom</div>
+  <div class="tagline">visual onomatopoeia &nbsp;·&nbsp; sound on screen</div>
+  <button id="activate-btn">activate microphone</button>
+</div>
+<div id="status">listening</div>
+<div id="deny-msg">microphone access denied — running in autonomous mode</div>
 
 <script>
-new p5(function(s) {
-  let particles = [];
-  const N = 60;
+// ── Web Audio API ─────────────────────────────────────
+let audioCtx = null, analyser = null, dataArray = null;
 
+const btn      = document.getElementById('activate-btn');
+const centerUI = document.getElementById('center-ui');
+const statusEl = document.getElementById('status');
+const denyMsg  = document.getElementById('deny-msg');
+
+btn.addEventListener('click', async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 1024;
+    analyser.smoothingTimeConstant = 0.88;
+    audioCtx.createMediaStreamSource(stream).connect(analyser);
+    dataArray = new Uint8Array(analyser.frequencyBinCount);
+    window._micReady = true;
+    centerUI.classList.add('hidden');
+    statusEl.classList.add('visible');
+  } catch(e) {
+    window._micDenied = true;
+    centerUI.classList.add('hidden');
+    denyMsg.classList.add('visible');
+    setTimeout(() => denyMsg.classList.remove('visible'), 4000);
+  }
+});
+
+function getRawSpectrum() {
+  if (!analyser || !dataArray) return null;
+  analyser.getByteFrequencyData(dataArray);
+  return dataArray;
+}
+
+// ── p5 sketch ─────────────────────────────────────────
+new p5(function(s) {
+
+  const NUM_BANDS = 128;
+  const NUM_RINGS = 4;
+
+  let activated  = false;
+  let micAllowed = false;
+  let t = 0, autoPhase = 0;
+
+  // Amplitude envelope: fast attack, slow release
+  let peakAmp  = 0;
+  let bands    = new Array(NUM_BANDS).fill(0);
+  let bandPeak = new Array(NUM_BANDS).fill(0);
+
+  // Gated hue oscillator
+  // Oscillator runs continuously but only advances when a peak crosses
+  // the gate threshold. Between transients hue locks at its current value.
+  const HUE_GATE_THRESH = 0.18; // amplitude threshold to open gate
+  const HUE_SPEED       = 0.28; // degrees per frame at full gate open
+  let huePhase   = 168;         // starts at cyan
+  let gateLevel  = 0;           // smoothed gate signal 0–1
+  let displayHue = 168;         // hue used for drawing, interpolates toward huePhase
+
+  let rings     = [];
+  let fragments = [];
+
+  // ── Setup ─────────────────────────────────────────
   s.setup = function() {
     let cnv = s.createCanvas(s.windowWidth, s.windowHeight);
-    cnv.parent('canvas-container');
+    cnv.position(0, 0);
     s.colorMode(s.HSB, 360, 100, 100, 100);
+    s.angleMode(s.RADIANS);
     s.noFill();
-    for (let i = 0; i < N; i++) {
-      particles.push({
-        x: s.random(s.width),
-        y: s.random(s.height),
-        vx: s.random(-0.3, 0.3),
-        vy: s.random(-0.3, 0.3),
-        r: s.random(40, 160),
-        hue: s.random(25, 45),
-        phase: s.random(s.TWO_PI),
-        speed: s.random(0.003, 0.008)
+
+    for (let i = 0; i < NUM_RINGS; i++) {
+      rings.push({
+        baseRadius: 85 + i * 62,
+        phase:      (i / NUM_RINGS) * s.TWO_PI,
+        rotSpeed:   (0.0012 + i * 0.0007) * (i % 2 === 0 ? 1 : -1),
+        thickness:  2.8 + i * 0.9,
+        sat:        62 + i * 7,
+        segments:   256
       });
     }
   };
 
+  // ── Draw ──────────────────────────────────────────
   s.draw = function() {
-    s.clear();
-    let t = s.millis() * 0.001;
 
-    for (let p of particles) {
-      p.x += p.vx + s.noise(p.x * 0.002, p.y * 0.002, t * 0.3) * 0.4 - 0.2;
-      p.y += p.vy + s.noise(p.x * 0.002 + 100, p.y * 0.002, t * 0.3) * 0.4 - 0.2;
+    // Mic handshake
+    if (window._micReady  && !activated) { activated = true; micAllowed = true;  window._micReady  = false; }
+    if (window._micDenied && !activated) { activated = true; micAllowed = false; window._micDenied = false; }
 
-      if (p.x < -200) p.x = s.width + 200;
-      if (p.x > s.width + 200) p.x = -200;
-      if (p.y < -200) p.y = s.height + 200;
-      if (p.y > s.height + 200) p.y = -200;
+    t = s.millis() * 0.001;
+    autoPhase += 0.006;
 
-      let alpha = (s.sin(t * p.speed * 6 + p.phase) * 0.5 + 0.5) * 18 + 4;
-      let radius = p.r * (0.8 + s.sin(t * p.speed * 4 + p.phase) * 0.2);
-
-      s.stroke(p.hue, 30, 80, alpha);
-      s.strokeWeight(0.5);
-      s.ellipse(p.x, p.y, radius, radius);
-
-      // Inner ring
-      s.stroke(p.hue, 20, 90, alpha * 0.5);
-      s.ellipse(p.x, p.y, radius * 0.4, radius * 0.4);
+    // ── Signal processing ────────────────────────────
+    let instAmp = 0;
+    if (micAllowed) {
+      let raw = getRawSpectrum();
+      if (raw) {
+        let binSize = Math.floor(raw.length / NUM_BANDS);
+        for (let i = 0; i < NUM_BANDS; i++) {
+          let sum = 0;
+          for (let j = 0; j < binSize; j++) sum += raw[i * binSize + j];
+          let v = (sum / binSize) / 255;
+          instAmp += v;
+          bandPeak[i] = v > bandPeak[i]
+            ? s.lerp(bandPeak[i], v, 0.45)
+            : s.lerp(bandPeak[i], v, 0.03);
+          bands[i] = bandPeak[i];
+        }
+        instAmp /= NUM_BANDS;
+      }
+    } else {
+      // Autonomous Perlin noise signal
+      instAmp = s.noise(t * 0.3) * 0.28 + 0.04;
+      for (let i = 0; i < NUM_BANDS; i++) {
+        let v = s.noise(i * 0.08, t * 0.22) * 0.6;
+        bandPeak[i] = v > bandPeak[i]
+          ? s.lerp(bandPeak[i], v, 0.2)
+          : s.lerp(bandPeak[i], v, 0.025);
+        bands[i] = bandPeak[i];
+      }
     }
 
-    // Sparse grid lines
-    s.stroke(35, 15, 70, 6);
-    s.strokeWeight(0.3);
-    let gridSize = 80;
-    for (let x = 0; x < s.width; x += gridSize) {
-      s.line(x, 0, x, s.height);
+    // Global peak-hold amplitude
+    peakAmp = instAmp > peakAmp
+      ? s.lerp(peakAmp, instAmp, 0.35)
+      : s.lerp(peakAmp, instAmp, 0.012);
+
+    // ── Gated hue oscillator ─────────────────────────
+    let rawGate = peakAmp > HUE_GATE_THRESH ? 1.0 : 0.0;
+    gateLevel = rawGate > gateLevel
+      ? s.lerp(gateLevel, rawGate, 0.4)    // fast attack
+      : s.lerp(gateLevel, rawGate, 0.04);  // slow release
+
+    huePhase = (huePhase + HUE_SPEED * gateLevel) % 360;
+
+    // Shortest-arc interpolation to prevent 360→0 snap
+    let diff = ((huePhase - displayHue + 540) % 360) - 180;
+    displayHue = (displayHue + diff * 0.08 + 360) % 360;
+
+    let hue2 = (displayHue + 22) % 360;
+
+    // ── Background ───────────────────────────────────
+    s.background(240, 18, 3, 22);
+
+    let cx = s.width  / 2;
+    let cy = s.height / 2;
+
+    // ── Waveform rings ────────────────────────────────
+    // Each ring is a single continuous closed shape.
+    // FFT bands modulate radial displacement — no individual lines.
+    let ampMod = peakAmp * (activated ? 85 : 45);
+
+    for (let ri = 0; ri < NUM_RINGS; ri++) {
+      let r = rings[ri];
+      r.phase += r.rotSpeed;
+
+      let baseR = r.baseRadius + ampMod;
+
+      // Outer ring
+      s.beginShape();
+      for (let i = 0; i <= r.segments; i++) {
+        let pct   = i / r.segments;
+        let angle = pct * s.TWO_PI + r.phase;
+        let bidx  = Math.floor(pct * NUM_BANDS);
+        let bv    = bands[bidx] || 0;
+
+        let disp = activated
+          ? bv * (75 + ri * 22)
+          : s.noise(i * 0.035, t * 0.16 + ri) * (22 + ri * 7);
+
+        let rx = cx + s.cos(angle) * (baseR + disp);
+        let ry = cy + s.sin(angle) * (baseR + disp);
+
+        let alpha = activated
+          ? s.constrain(16 + bv * 58 + peakAmp * 30, 8, 85)
+          : s.constrain(7 + ri * 3, 4, 22);
+
+        s.stroke(displayHue, r.sat, 88, alpha);
+        s.strokeWeight(r.thickness + (activated ? bv * 2.2 : 0));
+        s.vertex(rx, ry);
+      }
+      s.endShape(s.CLOSE);
+
+      // Inner counter-rotating mirror ring
+      let innerBase = r.baseRadius * 0.5 + ampMod * 0.35;
+      s.beginShape();
+      for (let i = 0; i <= r.segments; i++) {
+        let pct   = i / r.segments;
+        let angle = pct * s.TWO_PI - r.phase * 0.65;
+        let bidx  = Math.floor(pct * NUM_BANDS);
+        let bv    = bands[bidx] || 0;
+
+        let disp = activated
+          ? bv * (38 + ri * 10)
+          : s.noise(i * 0.045, t * 0.13 + ri + 8) * (12 + ri * 4);
+
+        let rx = cx + s.cos(angle) * (innerBase + disp);
+        let ry = cy + s.sin(angle) * (innerBase + disp);
+
+        let alpha = activated
+          ? s.constrain(9 + bv * 36 + peakAmp * 18, 4, 55)
+          : s.constrain(4 + ri * 2, 2, 14);
+
+        s.stroke(hue2, r.sat - 14, 92, alpha);
+        s.strokeWeight((r.thickness * 0.52) + (activated ? bv * 1.0 : 0));
+        s.vertex(rx, ry);
+      }
+      s.endShape(s.CLOSE);
     }
-    for (let y = 0; y < s.height; y += gridSize) {
-      s.line(0, y, s.width, y);
+
+    // ── Fragments ─────────────────────────────────────
+    // Slow, long-lived shards. Fade in gently, decay slowly.
+    if (fragments.length < 100) {
+      let prob = activated
+        ? (peakAmp > 0.2 ? peakAmp * 0.35 : 0)
+        : 0.015;
+      if (s.random() < prob) {
+        let angle  = s.random(s.TWO_PI);
+        let midR   = (rings[0].baseRadius + rings[NUM_RINGS-1].baseRadius) * 0.5;
+        let spawnR = midR + s.random(-70, 70);
+        let spd    = activated ? s.random(0.35, 1.2) : s.random(0.08, 0.35);
+        let fragHue = (displayHue + s.random(-18, 18) + 360) % 360;
+        fragments.push({
+          x: cx + s.cos(angle) * spawnR,
+          y: cy + s.sin(angle) * spawnR,
+          vx: s.cos(angle + s.random(-0.5, 0.5)) * spd * 0.25,
+          vy: s.sin(angle + s.random(-0.5, 0.5)) * spd * 0.25,
+          sz: s.random(5, 15) * (1 + peakAmp * 1.2),
+          ang: s.random(s.TWO_PI),
+          spin: s.random(-0.018, 0.018),
+          life: 0.0,
+          growing: true,
+          decay: s.random(0.004, 0.011),
+          hue: fragHue,
+          sat: 65 + s.random(22)
+        });
+      }
+    }
+
+    for (let i = fragments.length - 1; i >= 0; i--) {
+      let f = fragments[i];
+      f.x += f.vx;
+      f.y += f.vy;
+      f.ang += f.spin;
+
+      if (f.growing) {
+        f.life = Math.min(f.life + 0.04, 1.0);
+        if (f.life >= 1.0) f.growing = false;
+      } else {
+        f.life -= f.decay;
+      }
+      if (f.life <= 0) { fragments.splice(i, 1); continue; }
+
+      s.push();
+      s.translate(f.x, f.y);
+      s.rotate(f.ang);
+      s.stroke(f.hue, f.sat, 88, f.life * 55);
+      s.strokeWeight(2.0);
+      s.noFill();
+      s.beginShape();
+      s.vertex(0, -f.sz);
+      s.vertex(f.sz * 0.65, -f.sz * 0.15);
+      s.vertex(f.sz * 0.45, f.sz * 0.72);
+      s.vertex(-f.sz * 0.35, f.sz * 0.48);
+      s.vertex(-f.sz * 0.52, -f.sz * 0.42);
+      s.endShape(s.CLOSE);
+      s.pop();
+    }
+
+    // ── Central void ──────────────────────────────────
+    let voidR = 26 + peakAmp * 38;
+    for (let i = 3; i >= 0; i--) {
+      let rr = voidR + i * 9;
+      let a  = activated
+        ? s.constrain(2.5 + peakAmp * 16 - i * 2, 0, 25)
+        : Math.max(0, 1.2 - i * 0.3);
+      s.stroke(220, 14, 16, a);
+      s.strokeWeight(1.8);
+      s.ellipse(cx, cy, rr * 2, rr * 2);
+    }
+
+    if (activated) {
+      let dotR = 2 + peakAmp * 7;
+      s.fill(displayHue, 50, 88, 30 + peakAmp * 40);
+      s.noStroke();
+      s.ellipse(cx, cy, dotR * 2, dotR * 2);
+      s.noFill();
     }
   };
 
   s.windowResized = function() {
     s.resizeCanvas(s.windowWidth, s.windowHeight);
   };
+
 });
 </script>
-
 </body>
 </html>
