@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Max Deadroom — About</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;1,300&family=Owners+Text:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --fg: #e8e4dc;
+      --accent: #c8b89a;
+      --dim: #4a4540;
+      --mid: #2a2520;
+      --mono: 'IBM Plex Mono', monospace;
+      --serif: Georgia, 'Times New Roman', serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--mono);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Generative canvas background */
+    #canvas-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      opacity: 0.18;
+      pointer-events: none;
+    }
+
+    /* Nav */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2.5rem;
+      border-bottom: 1px solid var(--mid);
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(8px);
+    }
+
+    .nav-id {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--fg); }
+
+    /* Main content */
+    main {
+      position: relative;
+      z-index: 10;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 10rem 2.5rem 6rem;
+    }
+
+    /* Header block */
+    .header-block {
+      margin-bottom: 5rem;
+      border-left: 1px solid var(--dim);
+      padding-left: 2rem;
+    }
+
+    .label {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 1.2rem;
+    }
+
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.05;
+      color: var(--fg);
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.02em;
+    }
+
+    .name-sub {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-top: 1rem;
+    }
+
+    .name-sub span {
+      color: var(--accent);
+    }
+
+    /* Divider */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--mid);
+      margin: 3rem 0;
+    }
+
+    /* Bio sections */
+    .bio-section {
+      margin-bottom: 3.5rem;
+    }
+
+    .section-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--mid);
+    }
+
+    p {
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      font-weight: 300;
+      line-height: 1.85;
+      color: #c8c4bc;
+      margin-bottom: 1.4rem;
+    }
+
+    p em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    /* Roles block */
+    .roles-block {
+      margin: 3rem 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5px;
+      background: var(--mid);
+      border: 1px solid var(--mid);
+    }
+
+    .role-cell {
+      background: var(--bg);
+      padding: 1.5rem;
+    }
+
+    .role-title {
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .role-org {
+      font-size: 0.8rem;
+      color: var(--fg);
+      margin-bottom: 0.3rem;
+      font-weight: 400;
+    }
+
+    .role-desc {
+      font-size: 0.68rem;
+      color: var(--dim);
+      line-height: 1.6;
+      font-family: var(--mono);
+    }
+
+    /* Tags / disciplines */
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 2rem;
+    }
+
+    .tag {
+      font-size: 0.58rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--dim);
+      border: 1px solid var(--mid);
+      padding: 0.35rem 0.7rem;
+      transition: all 0.2s;
+    }
+
+    .tag:hover {
+      color: var(--accent);
+      border-color: var(--dim);
+    }
+
+    /* Footer strip */
+    .page-footer {
+      margin-top: 5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--mid);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-id {
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: var(--dim);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-links a {
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--accent); }
+
+    /* Pulse indicator */
+    .pulse {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-right: 0.5rem;
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    @media (max-width: 600px) {
+      .roles-block { grid-template-columns: 1fr; }
+      nav { padding: 1.2rem 1.5rem; }
+      main { padding: 8rem 1.5rem 4rem; }
+      .header-block { padding-left: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<nav>
+  <div class="nav-id">deadroom.net</div>
+  <ul class="nav-links">
+    <li><a href="#">work</a></li>
+    <li><a href="#">music</a></li>
+    <li><a href="#">about</a></li>
+    <li><a href="#">contact</a></li>
+  </ul>
+</nav>
+
+<main>
+
+  <div class="header-block">
+    <div class="label">— about</div>
+    <h1>Max Deadroom</h1>
+    <div class="name-sub">Maxwell Lewis &nbsp;/&nbsp; <span>Columbus, OH</span></div>
+  </div>
+
+  <div class="bio-section">
+    <div class="section-label">origin</div>
+    <p>
+      I've been making things with sound for over twenty years. It started with music — always music — and spread outward into audio engineering, film scoring, instrument design, generative composition, creative code, visual art. The tools changed constantly. The impulse didn't.
+    </p>
+    <p>
+      For a long time I thought I was building toward a specific destination: an academic career, a tenure track, a place at the front of a lecture hall. I had the degree, the experience, the conviction. Then I looked clearly at where that road was going — not with bitterness, but with the kind of honesty that only comes after years of moving in too many directions at once — and I chose differently.
+    </p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="bio-section">
+    <div class="section-label">now</div>
+    <p>
+      I moved back to Columbus, Ohio, my hometown. Returning gave me something I hadn't expected: permission to stop treating the breadth of my interests as a problem to solve. Twenty years of chasing sound into film, code, visual art, hardware, pedagogy — that's not a lack of focus. That's a method. It just took a while to trust it.
+    </p>
+    <p>
+      The work that feels most alive: making art, and creating conditions where others can make it too. Not as a service. As a practice. I am most myself when I am <em>building a thing</em> or <em>helping someone else find theirs</em> — those two states, alternating, constitute most of what I consider a good day.
+    </p>
+  </div>
+
+  <div class="roles-block">
+    <div class="role-cell">
+      <div class="role-title">Programming Director</div>
+      <div class="role-org">Columbus on the Spectrum</div>
+      <div class="role-desc">Community and networking nonprofit for autistic adults. Building programming that treats neurodivergence as a way of being, not a deficit to manage.</div>
+    </div>
+    <div class="role-cell">
+      <div class="role-title">Art Director</div>
+      <div class="role-org">Open Arms Health Systems</div>
+      <div class="role-desc">Occupational arts nonprofit for adults with disabilities. Supporting artists who want to make and sell work on their own terms.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="bio-section">
+    <div class="section-label">the work</div>
+    <p>
+      My practice sits at the intersection of sound, code, and image — usually in that order, often all at once. I work with modular synthesis and VCV Rack for composition, p5.js and Magic Music Visuals for audio-reactive visual art, and whatever combination of tools the piece requires. I am drawn to <em>process as content</em>: the patch, the improvisation, the system that surprises its author.
+    </p>
+    <p>
+      I make music under the name Max Deadroom. I make visual art under the same name. I am not particularly interested in separating them. The sound informs the image. The image informs the sound. The site you're looking at is built on the same logic.
+    </p>
+    <p>
+      I have been an audio engineer, a record producer, a filmmaker, a videographer, a sound designer, a lecturer, an instrument builder, a creative coder, a community organizer. I am not listing these as credentials. I am listing them as evidence of a single stubborn preoccupation: <em>what does it mean to make something, and how do you get better at it?</em>
+    </p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="bio-section">
+    <div class="section-label">on AI &amp; the field</div>
+    <p>
+      I spent two decades becoming expert in a craft that technology is now capable of approximating cheaply and at scale. I have complicated feelings about this, and I don't think pretending otherwise serves anyone. What I've concluded — provisionally, honestly — is that the irreplaceable parts of creative work have always been the human parts: the judgment, the care, the relationships, the willingness to be changed by what you make. I'm interested in those parts. I work in fields where they still matter. I will keep making things by hand.
+    </p>
+  </div>
+
+  <div class="tags">
+    <span class="tag">modular synthesis</span>
+    <span class="tag">musique concrète</span>
+    <span class="tag">generative composition</span>
+    <span class="tag">audio-reactive visuals</span>
+    <span class="tag">creative code</span>
+    <span class="tag">p5.js</span>
+    <span class="tag">vcv rack</span>
+    <span class="tag">film scoring</span>
+    <span class="tag">sound design</span>
+    <span class="tag">instrument design</span>
+    <span class="tag">community arts</span>
+    <span class="tag">neurodivergent</span>
+  </div>
+
+  <div class="page-footer">
+    <div class="footer-id">
+      <span class="pulse"></span>
+      max@deadroom.net
+    </div>
+    <div class="footer-links">
+      <a href="https://deadroommusic.bandcamp.com">bandcamp</a>
+      <a href="https://instagram.com/maxedonia">instagram</a>
+      <a href="https://github.com/maxedonia">github</a>
+      <a href="https://linkedin.com/in/maxedonia">linkedin</a>
+    </div>
+  </div>
+
+</main>
+
+<script>
+new p5(function(s) {
+  let particles = [];
+  const N = 60;
+
+  s.setup = function() {
+    let cnv = s.createCanvas(s.windowWidth, s.windowHeight);
+    cnv.parent('canvas-container');
+    s.colorMode(s.HSB, 360, 100, 100, 100);
+    s.noFill();
+    for (let i = 0; i < N; i++) {
+      particles.push({
+        x: s.random(s.width),
+        y: s.random(s.height),
+        vx: s.random(-0.3, 0.3),
+        vy: s.random(-0.3, 0.3),
+        r: s.random(40, 160),
+        hue: s.random(25, 45),
+        phase: s.random(s.TWO_PI),
+        speed: s.random(0.003, 0.008)
+      });
+    }
+  };
+
+  s.draw = function() {
+    s.clear();
+    let t = s.millis() * 0.001;
+
+    for (let p of particles) {
+      p.x += p.vx + s.noise(p.x * 0.002, p.y * 0.002, t * 0.3) * 0.4 - 0.2;
+      p.y += p.vy + s.noise(p.x * 0.002 + 100, p.y * 0.002, t * 0.3) * 0.4 - 0.2;
+
+      if (p.x < -200) p.x = s.width + 200;
+      if (p.x > s.width + 200) p.x = -200;
+      if (p.y < -200) p.y = s.height + 200;
+      if (p.y > s.height + 200) p.y = -200;
+
+      let alpha = (s.sin(t * p.speed * 6 + p.phase) * 0.5 + 0.5) * 18 + 4;
+      let radius = p.r * (0.8 + s.sin(t * p.speed * 4 + p.phase) * 0.2);
+
+      s.stroke(p.hue, 30, 80, alpha);
+      s.strokeWeight(0.5);
+      s.ellipse(p.x, p.y, radius, radius);
+
+      // Inner ring
+      s.stroke(p.hue, 20, 90, alpha * 0.5);
+      s.ellipse(p.x, p.y, radius * 0.4, radius * 0.4);
+    }
+
+    // Sparse grid lines
+    s.stroke(35, 15, 70, 6);
+    s.strokeWeight(0.3);
+    let gridSize = 80;
+    for (let x = 0; x < s.width; x += gridSize) {
+      s.line(x, 0, x, s.height);
+    }
+    for (let y = 0; y < s.height; y += gridSize) {
+      s.line(0, y, s.width, y);
+    }
+  };
+
+  s.windowResized = function() {
+    s.resizeCanvas(s.windowWidth, s.windowHeight);
+  };
+});
+</script>
+
+</body>
+</html>
