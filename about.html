@@ -387,7 +387,7 @@
   <div class="page-footer">
     <div class="footer-id">
       <span class="pulse"></span>
-      max@deadroom.net
+      <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2b464a536b4f4e4a4f5944444605454e5f">[email&#160;protected]</a>
     </div>
     <div class="footer-links">
       <a href="https://deadroommusic.bandcamp.com">bandcamp</a>
@@ -401,68 +401,113 @@
 
 <script>
 new p5(function(s) {
-  let particles = [];
-  const N = 60;
+
+  const NUM_RINGS = 4;
+  const NUM_BANDS = 128;
+
+  // Hue drifts on a slow sine wave — full cycle ~3.5 minutes
+  // No gate, no mic. Just time.
+  const HUE_PERIOD = 210; // seconds per full cycle
+
+  let rings = [];
+  let bands = new Array(NUM_BANDS).fill(0);
+  let t = 0;
 
   s.setup = function() {
     let cnv = s.createCanvas(s.windowWidth, s.windowHeight);
     cnv.parent('canvas-container');
     s.colorMode(s.HSB, 360, 100, 100, 100);
+    s.angleMode(s.RADIANS);
     s.noFill();
-    for (let i = 0; i < N; i++) {
-      particles.push({
-        x: s.random(s.width),
-        y: s.random(s.height),
-        vx: s.random(-0.3, 0.3),
-        vy: s.random(-0.3, 0.3),
-        r: s.random(40, 160),
-        hue: s.random(25, 45),
-        phase: s.random(s.TWO_PI),
-        speed: s.random(0.003, 0.008)
+
+    for (let i = 0; i < NUM_RINGS; i++) {
+      rings.push({
+        baseRadius: 85 + i * 62,
+        phase:      (i / NUM_RINGS) * s.TWO_PI,
+        rotSpeed:   (0.0008 + i * 0.0005) * (i % 2 === 0 ? 1 : -1),
+        thickness:  1.8 + i * 0.6,
+        sat:        28 + i * 4, // lower sat than homepage — text legibility
+        segments:   256
       });
     }
   };
 
   s.draw = function() {
     s.clear();
-    let t = s.millis() * 0.001;
+    t = s.millis() * 0.001;
 
-    for (let p of particles) {
-      p.x += p.vx + s.noise(p.x * 0.002, p.y * 0.002, t * 0.3) * 0.4 - 0.2;
-      p.y += p.vy + s.noise(p.x * 0.002 + 100, p.y * 0.002, t * 0.3) * 0.4 - 0.2;
-
-      if (p.x < -200) p.x = s.width + 200;
-      if (p.x > s.width + 200) p.x = -200;
-      if (p.y < -200) p.y = s.height + 200;
-      if (p.y > s.height + 200) p.y = -200;
-
-      let alpha = (s.sin(t * p.speed * 6 + p.phase) * 0.5 + 0.5) * 18 + 4;
-      let radius = p.r * (0.8 + s.sin(t * p.speed * 4 + p.phase) * 0.2);
-
-      s.stroke(p.hue, 30, 80, alpha);
-      s.strokeWeight(0.5);
-      s.ellipse(p.x, p.y, radius, radius);
-
-      // Inner ring
-      s.stroke(p.hue, 20, 90, alpha * 0.5);
-      s.ellipse(p.x, p.y, radius * 0.4, radius * 0.4);
+    // Autonomous Perlin noise spectrum — slow, ambient
+    for (let i = 0; i < NUM_BANDS; i++) {
+      let v = s.noise(i * 0.08, t * 0.12) * 0.5;
+      bands[i] = s.lerp(bands[i], v, 0.03);
     }
 
-    // Sparse grid lines
-    s.stroke(35, 15, 70, 6);
-    s.strokeWeight(0.3);
-    let gridSize = 80;
-    for (let x = 0; x < s.width; x += gridSize) {
-      s.line(x, 0, x, s.height);
-    }
-    for (let y = 0; y < s.height; y += gridSize) {
-      s.line(0, y, s.width, y);
+    // Slow sine hue drift — never pauses, never jumps
+    // Maps sine output (–1 to 1) to full hue range
+    let hue = (s.sin((t / HUE_PERIOD) * s.TWO_PI) * 0.5 + 0.5) * 360;
+    let hue2 = (hue + 22) % 360;
+
+    let cx = s.width  / 2;
+    let cy = s.height / 2;
+
+    // Global breathe — very slow, low amplitude
+    let breathe = s.noise(t * 0.08) * 18;
+
+    for (let ri = 0; ri < NUM_RINGS; ri++) {
+      let r = rings[ri];
+      r.phase += r.rotSpeed;
+
+      let baseR = r.baseRadius + breathe;
+
+      // Outer ring
+      s.beginShape();
+      for (let i = 0; i <= r.segments; i++) {
+        let pct   = i / r.segments;
+        let angle = pct * s.TWO_PI + r.phase;
+        let bidx  = Math.floor(pct * NUM_BANDS);
+        let bv    = bands[bidx] || 0;
+
+        let disp   = s.noise(i * 0.035, t * 0.1 + ri) * (20 + ri * 6) + bv * 18;
+        let radius = baseR + disp;
+
+        let rx = cx + s.cos(angle) * radius;
+        let ry = cy + s.sin(angle) * radius;
+
+        let alpha = s.constrain(5 + ri * 2.5, 3, 16);
+
+        s.stroke(hue, r.sat, 82, alpha);
+        s.strokeWeight(r.thickness);
+        s.vertex(rx, ry);
+      }
+      s.endShape(s.CLOSE);
+
+      // Inner counter-rotating mirror ring
+      let innerBase = r.baseRadius * 0.5 + breathe * 0.4;
+      s.beginShape();
+      for (let i = 0; i <= r.segments; i++) {
+        let pct   = i / r.segments;
+        let angle = pct * s.TWO_PI - r.phase * 0.65;
+        let bidx  = Math.floor(pct * NUM_BANDS);
+        let bv    = bands[bidx] || 0;
+
+        let disp   = s.noise(i * 0.045, t * 0.09 + ri + 8) * (10 + ri * 3) + bv * 10;
+        let radius = innerBase + disp;
+
+        let rx = cx + s.cos(angle) * radius;
+        let ry = cy + s.sin(angle) * radius;
+
+        s.stroke(hue2, r.sat - 10, 88, s.constrain(3 + ri * 1.5, 2, 10));
+        s.strokeWeight(r.thickness * 0.5);
+        s.vertex(rx, ry);
+      }
+      s.endShape(s.CLOSE);
     }
   };
 
   s.windowResized = function() {
     s.resizeCanvas(s.windowWidth, s.windowHeight);
   };
+
 });
 </script>
 
